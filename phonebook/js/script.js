@@ -76,7 +76,7 @@ const data = [
     const btnWrapper = document.createElement('div');
     btnWrapper.classList.add('btn-wrapper');
 
-    const buttons = params.map(({ className, type, text }) => {
+    const buttons = params.map(({className, type, text}) => {
       const button = document.createElement('button');
       button.type = type;
       button.className = className;
@@ -104,6 +104,7 @@ const data = [
         <td>Имя</td>
         <td>Фамилия</td>
         <td>Телефон</td>
+        <td></td>
       </tr>
     `);
 
@@ -191,10 +192,14 @@ const data = [
 
     return {
       list: table.tbody,
+      logo,
+      btnAdd: buttonsGroup.buttons[0],
+      formOverlay: form.overlay,
+      form: form.form,
     };
   };
 
-  const createRow = ({ name: firstname, surname, phone }) => {
+  const createRow = ({name: firstname, surname, phone}) => {
     const row = document.createElement('tr');
 
     const columnDelete = document.createElement('td');
@@ -213,9 +218,20 @@ const data = [
     const phoneLink = document.createElement('a');
     phoneLink.href = `tel:${phone}`;
     phoneLink.textContent = phone;
+    row.phoneLink = phoneLink;
     columnPhone.append(phoneLink);
 
-    row.append(columnDelete, columnName, columnSurname, columnPhone);
+    /**
+     * Необязательное задание к уроку 5
+     */
+    const columnEdit = document.createElement('td');
+    const btnEdit = document.createElement('button');
+    btnEdit.classList.add('btn', 'btn-success');
+    btnEdit.textContent = 'Редактировать';
+    columnEdit.append(btnEdit);
+
+    row.append(columnDelete, columnName, columnSurname, columnPhone,
+        columnEdit);
 
     return row;
   };
@@ -223,15 +239,46 @@ const data = [
   const renderContacts = (elem, data) => {
     const allRow = data.map(createRow);
     elem.append(...allRow);
+
+    return allRow;
+  };
+
+  const hoverRow = (allRow, logo) => {
+    const text = logo.textContent;
+
+    allRow.forEach(contact => {
+      contact.addEventListener('mouseover', () => {
+        logo.textContent = contact.phoneLink.textContent;
+      });
+      contact.addEventListener('mouseleave', () => {
+        logo.textContent = text;
+      });
+    });
   };
 
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhonebook(app, title);
 
-    const { list } = phoneBook;
+    const {list, logo, btnAdd, formOverlay, form} = phoneBook;
 
-    renderContacts(list, data);
+    // Функционал
+
+    const allRow = renderContacts(list, data);
+
+    hoverRow(allRow, logo);
+
+    btnAdd.addEventListener('click', () => {
+      formOverlay.classList.add('is-visible');
+    });
+
+    form.addEventListener('click', e => {
+      e.stopPropagation();
+    });
+
+    formOverlay.addEventListener('click', () => {
+      formOverlay.classList.remove('is-visible');
+    });
   };
 
   window.phonebookInit = init;
