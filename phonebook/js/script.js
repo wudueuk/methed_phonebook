@@ -76,7 +76,7 @@ const data = [
     const btnWrapper = document.createElement('div');
     btnWrapper.classList.add('btn-wrapper');
 
-    const buttons = params.map(({className, type, text}) => {
+    const buttons = params.map(({ className, type, text }) => {
       const button = document.createElement('button');
       button.type = type;
       button.className = className;
@@ -199,22 +199,25 @@ const data = [
     };
   };
 
-  const createRow = ({name: firstname, surname, phone}) => {
+  const createRow = ({ name: firstname, surname, phone }) => {
     const row = document.createElement('tr');
 
     const columnDelete = document.createElement('td');
-    columnDelete.classList.add('delete');
+    columnDelete.classList.add('delete', 'aling-middle');
     const btnDelete = document.createElement('button');
     btnDelete.classList.add('del-icon');
     columnDelete.append(btnDelete);
 
     const columnName = document.createElement('td');
+    columnName.classList.add('align-middle');
     columnName.textContent = firstname;
 
     const columnSurname = document.createElement('td');
+    columnSurname.classList.add('align-middle');
     columnSurname.textContent = surname;
 
     const columnPhone = document.createElement('td');
+    columnPhone.classList.add('align-middle');
     const phoneLink = document.createElement('a');
     phoneLink.href = `tel:${phone}`;
     phoneLink.textContent = phone;
@@ -225,13 +228,14 @@ const data = [
      * Необязательное задание к уроку 5
      */
     const columnEdit = document.createElement('td');
+    columnEdit.classList.add('align-middle');
     const btnEdit = document.createElement('button');
     btnEdit.classList.add('btn', 'btn-success');
     btnEdit.textContent = 'Редактировать';
     columnEdit.append(btnEdit);
 
     row.append(columnDelete, columnName, columnSurname, columnPhone,
-        columnEdit);
+      columnEdit);
 
     return row;
   };
@@ -260,7 +264,7 @@ const data = [
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhonebook(app, title);
 
-    const {list, logo, btnAdd, formOverlay, form} = phoneBook;
+    const { list, logo, btnAdd, formOverlay, form } = phoneBook;
 
     // Функционал
 
