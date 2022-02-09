@@ -99,11 +99,11 @@ const data = [
 
     const thead = document.createElement('thead');
     thead.insertAdjacentHTML('beforeend', `
-      <tr>
+      <tr class="tableTitle">
         <td class="delete">Удалить</td>
-        <td>Имя</td>
-        <td>Фамилия</td>
-        <td>Телефон</td>
+        <td class="titleName">Имя</td>
+        <td class="titleSurname">Фамилия</td>
+        <td class="titlePhone">Телефон</td>
         <td></td>
       </tr>
     `);
@@ -194,6 +194,7 @@ const data = [
       list: table.tbody,
       logo,
       btnAdd: buttonsGroup.buttons[0],
+      btnDel: buttonsGroup.buttons[1],
       formOverlay: form.overlay,
       form: form.form,
     };
@@ -201,9 +202,10 @@ const data = [
 
   const createRow = ({ name: firstname, surname, phone }) => {
     const row = document.createElement('tr');
+    row.classList.add('contact');
 
     const columnDelete = document.createElement('td');
-    columnDelete.classList.add('delete', 'aling-middle');
+    columnDelete.classList.add('delete', 'align-middle');
     const btnDelete = document.createElement('button');
     btnDelete.classList.add('del-icon');
     columnDelete.append(btnDelete);
@@ -224,9 +226,6 @@ const data = [
     row.phoneLink = phoneLink;
     columnPhone.append(phoneLink);
 
-    /**
-     * Необязательное задание к уроку 5
-     */
     const columnEdit = document.createElement('td');
     columnEdit.classList.add('align-middle');
     const btnEdit = document.createElement('button');
@@ -260,11 +259,27 @@ const data = [
     });
   };
 
+  const sortPhonebook = (param) => {
+    if (param === 'name') {
+      data.sort((a, b) => a.name > b.name ? 1 : -1);
+    }
+    if (param === 'surname') {
+      data.sort((a, b) => a.surname > b.surname ? 1 : -1);
+    }
+  };
+
   const init = (selectorApp, title) => {
     const app = document.querySelector(selectorApp);
     const phoneBook = renderPhonebook(app, title);
 
-    const { list, logo, btnAdd, formOverlay, form } = phoneBook;
+    const {
+      list,
+      logo,
+      btnAdd,
+      btnDel,
+      formOverlay,
+      form,
+    } = phoneBook;
 
     // Функционал
 
@@ -276,12 +291,44 @@ const data = [
       formOverlay.classList.add('is-visible');
     });
 
-    form.addEventListener('click', e => {
-      e.stopPropagation();
+    formOverlay.addEventListener('click', e => {
+      const target = e.target;
+      if (target === formOverlay || target.closest('.close')) {
+        formOverlay.classList.remove('is-visible');
+      }
     });
 
-    formOverlay.addEventListener('click', () => {
-      formOverlay.classList.remove('is-visible');
+    btnDel.addEventListener('click', () => {
+      document.querySelectorAll('.delete').forEach(del => {
+        del.classList.toggle('is-visible');
+      });
+    });
+
+    list.addEventListener('click', e => {
+      const target = e.target;
+      if (target.closest('.del-icon')) {
+        target.closest('.contact').remove();
+      }
+    });
+
+    /**
+     * Необязательное задание к уроку 6
+     * - сортировка телефонного списка -
+     */
+
+    const tableTitle = document.querySelector('.tableTitle');
+    tableTitle.addEventListener('click', e => {
+      const target = e.target;
+
+      if (target.className === 'titleName') {
+        sortPhonebook('name');
+      }
+      if (target.className === 'titleSurname') {
+        sortPhonebook('surname');
+      }
+      const tbody = document.querySelector('tbody');
+      tbody.textContent = '';
+      renderContacts(list, data);
     });
   };
 
