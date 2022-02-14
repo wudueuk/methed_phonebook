@@ -1,32 +1,27 @@
 'use strict';
 
-const data = [
-  {
-    name: 'Иван',
-    surname: 'Петров',
-    phone: '+79514545454',
-  },
-  {
-    name: 'Игорь',
-    surname: 'Семёнов',
-    phone: '+79999999999',
-  },
-  {
-    name: 'Семён',
-    surname: 'Иванов',
-    phone: '+79800252525',
-  },
-  {
-    name: 'Мария',
-    surname: 'Попова',
-    phone: '+79876543210',
-  },
-];
+// массив для телефонной книги
+const data = [];
 
 {
+  // ---- Урок 8 ----
+  // получение контакта из localStorage
+  const getStorage = key => localStorage.getItem(key);
+
+  // Запись контакта в localStorage
+  const setStorage = (key, value) => {
+    localStorage.setItem(key, JSON.stringify(value));
+  };
+
+  // удаление контакта из localStorage
+  const removeStorage = tel => {
+    localStorage.removeItem(tel);
+  };
+
+  // добавление контакта в книгу (массив и localStorage)
   const addContactData = contact => {
     data.push(contact);
-    console.log('data: ', data);
+    setStorage(contact.phone, contact);
   };
 
   const createContainer = () => {
@@ -81,7 +76,7 @@ const data = [
     const btnWrapper = document.createElement('div');
     btnWrapper.classList.add('btn-wrapper');
 
-    const buttons = params.map(({ className, type, text }) => {
+    const buttons = params.map(({className, type, text}) => {
       const button = document.createElement('button');
       button.type = type;
       button.className = className;
@@ -188,7 +183,7 @@ const data = [
     ]);
     const table = createTable();
 
-    const { form, overlay } = createForm();
+    const {form, overlay} = createForm();
 
     header.headerContainer.append(logo);
     main.mainContainer.append(buttonsGroup.btnWrapper, table, overlay);
@@ -201,13 +196,15 @@ const data = [
       btnAdd: buttonsGroup.buttons[0],
       btnDel: buttonsGroup.buttons[1],
       formOverlay: overlay,
-      form: form,
+      form,
     };
   };
 
-  const createRow = ({ name: firstname, surname, phone }) => {
+  // функция создания строки контакта
+  const createRow = ({name: firstname, surname, phone}) => {
     const row = document.createElement('tr');
     row.classList.add('contact');
+    row.dataset.tel = phone;
 
     const columnDelete = document.createElement('td');
     columnDelete.classList.add('delete', 'align-middle');
@@ -239,11 +236,12 @@ const data = [
     columnEdit.append(btnEdit);
 
     row.append(columnDelete, columnName, columnSurname, columnPhone,
-      columnEdit);
+        columnEdit);
 
     return row;
   };
 
+  // Формирует и выводит строки телефонной книги
   const renderContacts = (elem, data) => {
     const allRow = data.map(createRow);
     elem.append(...allRow);
@@ -251,6 +249,7 @@ const data = [
     return allRow;
   };
 
+  // функция смены шапки телефонного списка
   const hoverRow = (allRow, logo) => {
     const text = logo.textContent;
 
@@ -264,16 +263,14 @@ const data = [
     });
   };
 
-  /**
-   * сортировка телефонного списка
-   */
-
-  const sortPhonebook = (param) => {
+  // сортировка телефонного списка
+  const sortPhonebook = param => {
+    console.log('param: ', param);
     if (param === 'name') {
-      data.sort((a, b) => a.name > b.name ? 1 : -1);
+      data.sort((a, b) => (a.name > b.name ? 1 : -1));
     }
     if (param === 'surname') {
-      data.sort((a, b) => a.surname > b.surname ? 1 : -1);
+      data.sort((a, b) => (a.surname > b.surname ? 1 : -1));
     }
   };
 
@@ -300,6 +297,7 @@ const data = [
     };
   };
 
+  // Функция удаления контакта
   const deleteControl = (btnDel, list) => {
     btnDel.addEventListener('click', () => {
       document.querySelectorAll('.delete').forEach(del => {
@@ -310,15 +308,21 @@ const data = [
     list.addEventListener('click', e => {
       const target = e.target;
       if (target.closest('.del-icon')) {
+        const tel = target.closest('.contact').dataset.tel;
+        removeStorage(tel);
+        data.splice(data.findIndex(elem =>
+          elem.phone === tel), 1);
         target.closest('.contact').remove();
       }
     });
   };
 
+  // функция добавления нового контакта на страницу
   const addContactPage = (contact, list) => {
     list.append(createRow(contact));
   };
 
+  // форма добавления нового контакта
   const formControl = (form, list, closeModal) => {
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -346,30 +350,44 @@ const data = [
       form,
     } = renderPhonebook(app, title);
 
-    // Функционал
+    // ----- Функционал -----
+    // получение списка контактов из localStorage
+    if (localStorage.length > 0) {
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key !== 'sort') {
+          data.push(JSON.parse(getStorage(key)));
+        }
+      }
 
+      if (getStorage('sort')) {
+        sortPhonebook(JSON.parse(getStorage('sort')));
+      }
+    } else console.error('phonebook is empty');
+
+    // вывод списка контактов
     const allRow = renderContacts(list, data);
-    const { closeModal } = modalControl(btnAdd, formOverlay);
 
+    const {closeModal} = modalControl(btnAdd, formOverlay);
+
+    // Изменение шапки при наведении на контакт
     hoverRow(allRow, logo);
 
     deleteControl(btnDel, list);
     formControl(form, list, closeModal);
 
-    /**
-     * Необязательное задание к уроку 6
-     * - сортировка телефонного списка -
-     */
-
+    // сортировка телефонного списка
     const tableTitle = document.querySelector('.tableTitle');
     tableTitle.addEventListener('click', e => {
       const target = e.target;
 
       if (target.className === 'titleName') {
         sortPhonebook('name');
+        setStorage('sort', 'name');
       }
       if (target.className === 'titleSurname') {
         sortPhonebook('surname');
+        setStorage('sort', 'surname');
       }
       const tbody = document.querySelector('tbody');
       tbody.textContent = '';
