@@ -8,20 +8,23 @@ const data = [];
   // получение контакта из localStorage
   const getStorage = key => localStorage.getItem(key);
 
-  // Запись контакта в localStorage
+  // Запись в localStorage
   const setStorage = (key, value) => {
-    localStorage.setItem(key, JSON.stringify(value));
+    localStorage.setItem(key, value);
   };
 
   // удаление контакта из localStorage
   const removeStorage = tel => {
-    localStorage.removeItem(tel);
+    data.splice(data.findIndex(elem =>
+      elem.phone === tel), 1);
+
+    setStorage('phonebook', JSON.stringify(data));
   };
 
   // добавление контакта в книгу (массив и localStorage)
   const addContactData = contact => {
     data.push(contact);
-    setStorage(contact.phone, contact);
+    setStorage('phonebook', JSON.stringify(data));
   };
 
   const createContainer = () => {
@@ -265,12 +268,13 @@ const data = [];
 
   // сортировка телефонного списка
   const sortPhonebook = param => {
-    console.log('param: ', param);
     if (param === 'name') {
       data.sort((a, b) => (a.name > b.name ? 1 : -1));
+      setStorage('phonebook', JSON.stringify(data));
     }
     if (param === 'surname') {
       data.sort((a, b) => (a.surname > b.surname ? 1 : -1));
+      setStorage('phonebook', JSON.stringify(data));
     }
   };
 
@@ -310,8 +314,6 @@ const data = [];
       if (target.closest('.del-icon')) {
         const tel = target.closest('.contact').dataset.tel;
         removeStorage(tel);
-        data.splice(data.findIndex(elem =>
-          elem.phone === tel), 1);
         target.closest('.contact').remove();
       }
     });
@@ -352,18 +354,8 @@ const data = [];
 
     // ----- Функционал -----
     // получение списка контактов из localStorage
-    if (localStorage.length > 0) {
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key !== 'sort') {
-          data.push(JSON.parse(getStorage(key)));
-        }
-      }
-
-      if (getStorage('sort')) {
-        sortPhonebook(JSON.parse(getStorage('sort')));
-      }
-    } else console.error('phonebook is empty');
+    const phonebookStorage = JSON.parse(getStorage('phonebook'));
+    if (phonebookStorage) data.push(...phonebookStorage);
 
     // вывод списка контактов
     const allRow = renderContacts(list, data);
@@ -383,11 +375,9 @@ const data = [];
 
       if (target.className === 'titleName') {
         sortPhonebook('name');
-        setStorage('sort', 'name');
       }
       if (target.className === 'titleSurname') {
         sortPhonebook('surname');
-        setStorage('sort', 'surname');
       }
       const tbody = document.querySelector('tbody');
       tbody.textContent = '';
