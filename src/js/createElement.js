@@ -1,3 +1,11 @@
+import image from '../img/icon.svg';
+
+export const createImageLogo = () => {
+  const img = document.createElement('img');
+  img.src = image;
+  return img;
+};
+
 const createContainer = () => {
   const container = document.createElement('div');
   container.classList.add('container');
@@ -50,7 +58,7 @@ const createButtonsGroup = params => {
   const btnWrapper = document.createElement('div');
   btnWrapper.classList.add('btn-wrapper');
 
-  const buttons = params.map(({className, type, text}) => {
+  const buttons = params.map(({ className, type, text }) => {
     const button = document.createElement('button');
     button.type = type;
     button.className = className;
@@ -139,7 +147,7 @@ const createForm = () => {
 };
 
 // функция создания строки контакта
-const createRow = ({name: firstname, surname, phone}) => {
+const createRow = ({ name: firstname, surname, phone }) => {
   const row = document.createElement('tr');
   row.classList.add('contact');
   row.dataset.tel = phone;
@@ -174,7 +182,7 @@ const createRow = ({name: firstname, surname, phone}) => {
   columnEdit.append(btnEdit);
 
   row.append(columnDelete, columnName, columnSurname, columnPhone,
-      columnEdit);
+    columnEdit);
 
   return row;
 };

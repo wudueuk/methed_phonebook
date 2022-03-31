@@ -1,6 +1,6 @@
-import data from './data.js';
-import {removeStorage, setStorage} from './storage.js';
-import {createRow} from './createElement.js';
+import data from './data';
+import { removeStorage, setStorage } from './storage';
+import { createRow } from './createElement';
 
 // Функция удаления контакта
 const deleteControl = (btnDel, list) => {

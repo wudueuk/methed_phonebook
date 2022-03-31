@@ -1,5 +1,5 @@
-import data from './data.js';
-import {setStorage} from './storage.js';
+import data from './data';
+import { setStorage } from './storage';
 
 // сортировка телефонного списка
 const sortPhonebook = param => {

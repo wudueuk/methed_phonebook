@@ -1,4 +1,4 @@
-import data from './data.js';
+import data from './data';
 
 // получение контакта из localStorage
 export const getStorage = key => localStorage.getItem(key);
